@@ -1,14 +1,7 @@
 # e-commerce-order-prediction-user-analytics
 The goal of this project is to build a machine learning model that predicts whether a user will place a new order within 7 days of their most recent purchase. This task addresses short-term user retention and helps identify high-risk churn users.
-## Goals
-### 1. Predict Next-7-Day Orders
 
-Build a machine-learning model to predict whether a user will place a new order within 7 days of their most recent purchase.
-
-Understand Key Retention Drivers
-Identify which user behaviors (e.g., order frequency, basket size, preferred departments) most influence repurchase, using feature-importance and SHAP analysis.
-
-User segmentation and RFM metrics: Model predictions and explanations, including a ranked list of high-risk churn users.
+**YouTube Presentation Link:** https://youtu.be/uRvAupdz2lM
 
 ## Dataset
 Instacart Market Basket Analysis (Kaggle)
@@ -23,43 +16,66 @@ order_products__prior.csv & order_products__train.csv – product IDs and quanti
 
 products.csv, aisles.csv, departments.csv – product and category details
 
-## Model
-### 1. Prediction Task
 
-**Goal** Predict whether a user will place a new order within 7 days of their most recent purchase (binary classification). The 7-day window is defined as the period immediately following an order, i.e., if the next purchase occurs within 0–6 days after the last order (same-day repeat orders included), it is labeled as a positive case; orders on day 7 or later are labeled as negative.
+## 1. Preliminary Visualizations
 
-Feature Engineering
+We performed exploratory analysis on the Instacart Online Grocery Dataset to understand user behavior patterns.
 
-User-level: average days between orders, total orders, basket size, preferred departments.
+- **Basket size distribution** — Average ≈ **10 items**, with a heavy tail for bulk shoppers.
+- **Order distribution by day of week** — Majority of orders occur on **weekends** (Sunday & Monday peaks).
+- **Top departments purchased** — *Produce*, *Dairy & Eggs*, and *Snacks* dominate.
+- **Days since prior order** — Right-skewed distribution; most users reorder within **0–10 days**, with a long-tail peak at 7 and 30.
 
-Order-level: order_dow (day of week), order_hour_of_day, days_since_prior_order.
+## 2. Data Processing
+For data processing, we started with files from the Instacart dataset — orders, order_products__prior, order_products__train, products, aisles, and departments.
+We combined prior and train order tables to form a unified purchase history and filled missing values in days_since_prior_order with zeros, since the first order for each user naturally has no previous interval
 
-Product aggregation: diversity of departments, top-N frequently purchased items.
+Then, we merged product metadata (aisle and department) into the product table to get category-level information.
+At the order level, we computed basket size (number of products per order) and appended it to each order record.
 
-**Models to Train**
+Next, we aggregated these into user-level features:
 
-Baseline: Logistic Regression for an interpretable starting point.
+Average days between orders
 
-Tree-Based Models: Random Forest and XGBoost (Gradient Boosted Trees) to capture non-linear interactions and typically strong tabular performance.
+Total number of orders per user
 
-(Optional Advanced): LightGBM or CatBoost for comparison and possible speed/accuracy gains.
+Average basket size
 
-**Training & Validation**
+Number of unique departments purchased
 
-Temporal split: first 70 % of the timeline for training, next 15 % for validation, final 15 % for testing to avoid data leakage.
+Finally, we created a supervised label: for each order, label = 1 if the next order occurred within 7 days; otherwise 0.
+This was implemented by shifting the order sequence within each user group to calculate the interval until the next purchase.
 
-Hyper-parameter tuning via grid search or Bayesian optimization.
+The final training table combines order-level and user-level features into a single dataframe ready for modeling.
 
-**Evaluation Metrics**
+## 3. Modeling Method
+Our current baseline model is a Logistic Regression, chosen for its interpretability and as a benchmark for future models.
 
-Primary: ROC-AUC and PR-AUC (handle class imbalance).
+The feature matrix X includes both order-level and user-level variables:
 
-Secondary: Accuracy, Precision, Recall, F1-score.
+days_since_prior_order, basket_size (short-term order behavior)
+
+avg_days_between_orders, total_orders, avg_basket_size, and unique_departments (long-term user behavior).
+
+We used an 80/20 stratified train-test split, keeping class balance.
+The model was trained using scikit-learn’s LogisticRegression(max_iter=1000) and evaluated with multiple metrics: ROC-AUC, Average Precision (PR-AUC), Accuracy, Precision, Recall, and F1-score
 
 
-## Data Visualization
+## 3. Preliminary Results
 
-ROC and Precision–Recall curves, confusion matrix heatmap, and feature-importance bar charts (e.g., SHAP values).
+Logistic regression achieved promising performance:
 
-Instead of setting a fixed target (e.g., ROC-AUC ≥ 0.75), performance will be compared across baselines and optimized models to assess improvements.
+ROC-AUC: 0.815
 
+Average Precision (PR-AUC): 0.745
+
+Accuracy: 0.75
+
+Precision: 0.69
+
+Recall: 0.64
+
+F1-score: 0.66
+
+These results suggest that even simple linear modeling can capture key reordering behavior from user activity patterns.
+Basket size, purchase frequency, and department diversity are strong indicators of short-term repurchase likelihood.
