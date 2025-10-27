@@ -1,7 +1,7 @@
 # e-commerce-order-prediction-user-analytics
 The goal of this project is to build a machine learning model that predicts whether a user will place a new order within 7 days of their most recent purchase. This task addresses short-term user retention and helps identify high-risk churn users.
 
-**YouTube Presentation Link:** https://youtu.be/uRvAupdz2lM
+**YouTube Presentation Link:** https://youtu.be/r9bAPOIOeOM
 
 ## Dataset
 Instacart Market Basket Analysis (Kaggle)
