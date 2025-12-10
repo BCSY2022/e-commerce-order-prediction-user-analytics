@@ -88,6 +88,16 @@ def main(data_dir: str = "../data"):
     print("  ../figures/classification_report_xgboost.txt")
     print("  ../figures/confusion_matrix_xgboost.png")
 
+    # predicted results
+    df_test = df_model.loc[X_test.index].copy()  # include user_id, order_id, feature, label_within7days
+
+    df_test["y_true"] = y_test
+    df_test["y_pred"] = y_pred
+    df_test["y_prob"] = y_prob
+
+    out_dir = Path("../data")
+    out_dir.mkdir(exist_ok=True)
+    df_test.to_csv(out_dir / "predictions_logreg_xgb.csv", index=False)
 
 if __name__ == "__main__":
     main()
