@@ -8,7 +8,7 @@ from sklearn.metrics import (
 
 from load_data import load_raw_data, build_order_level_features
 from build_dataset import add_label_within_7_days, assemble_training_table
-
+from pathlib import Path
 
 def main(data_dir: str = "../data"):
 
@@ -58,13 +58,17 @@ def main(data_dir: str = "../data"):
 
     roc = roc_auc_score(y_test, y_prob)
     pr_auc = average_precision_score(y_test, y_prob)
+    report_text = classification_report(y_test, y_pred)
 
     print(f"\nRandom Forest ROC-AUC: {roc:.4f}")
     print(f"Random Forest PR-AUC (Avg Precision): {pr_auc:.4f}\n")
+    print("\nClassification Report:\n", report_text)
+    output_dir = Path("../figures")
+    output_dir.mkdir(exist_ok=True)
 
-    print("Classification Report:")
-    print(classification_report(y_test, y_pred))
-
+    # Save into a text file
+    with open(output_dir / "classification_report_RF.txt", "w") as f:
+        f.write(report_text)
 
 if __name__ == "__main__":
     main()
