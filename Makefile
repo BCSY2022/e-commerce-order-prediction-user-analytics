@@ -1,6 +1,6 @@
 PYTHON = python
 
-.PHONY: install baseline rf xgb eda all clean
+.PHONY: install baseline rf xgb eda prediction_plots test all clean
 
 install:
 	$(PYTHON) -m pip install --upgrade pip
@@ -9,6 +9,10 @@ install:
 # EDA notebook
 eda:
 	$(PYTHON) -m jupyter nbconvert --to notebook --execute EDA_instacart.ipynb --output EDA_instacart_executed.ipynb
+
+# prediction plots notebook
+prediction_plots:
+	$(PYTHON) -m jupyter nbconvert --to notebook --execute prediction_plot.ipynb --output prediction_plot_executed.ipynb
 
 # Logistic Regression
 baseline:
@@ -22,8 +26,11 @@ rf:
 xgb:
 	cd src && $(PYTHON) train_xgb.py
 
-all: baseline rf xgb
+test:
+	cd src && $(PYTHON) test_sanity.py
+
+all: baseline rf xgb test prediction_plots
 
 clean:
 	rm -rf __pycache__ src/__pycache__ .pytest_cache
-	rm -f EDA_instacart_executed.ipynb
+	rm -f EDA_instacart_executed.ipynb prediction_plot_executed.ipynb
