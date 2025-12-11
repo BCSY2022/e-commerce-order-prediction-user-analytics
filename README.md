@@ -1,7 +1,17 @@
 # e-commerce-order-prediction-user-analytics
 The goal of this project is to build a machine learning model that predicts whether a user will place a new order within 7 days of their most recent purchase. This task addresses short-term user retention and helps identify high-risk churn users.
 
-**YouTube Presentation Link:** https://youtu.be/uRvAupdz2lM
+**YouTube Presentation Link:** https://youtu.be/uYlX4870tFc
+## How to Use
+1. Clone this repository and `cd` into it
+2. Download the Instacart Market Basket Analysis CSV files from Kaggle and place them in the data/ folder
+3. create a Python 3.9 environment, then install dependencies 
+`make install`
+4. Run the EDA notebook on the Instacart data
+`make eda`
+5. Train the model, test the data pipeline, and generate predictive visualizations.
+`make all`
+including `baseline rf xgb test prediction_plots`
 
 ## Dataset
 Instacart Market Basket Analysis (Kaggle)
@@ -18,7 +28,7 @@ products.csv, aisles.csv, departments.csv – product and category details
 
 
 ## 1. Preliminary Visualizations
-
+In `EDA_instacart.ipynb`
 We performed exploratory analysis on the Instacart Online Grocery Dataset to understand user behavior patterns.
 
 - **Basket size distribution** — Average ≈ **10 items**, with a heavy tail for bulk shoppers.
@@ -49,8 +59,9 @@ This was implemented by shifting the order sequence within each user group to ca
 The final training table combines order-level and user-level features into a single dataframe ready for modeling.
 
 ### 2.1 Correlation and feature insights
+In `train_baseline.py`
 ![Correlation matrix of features and target](figures/feature_corr.png)
-We also computed a correlation matrix between features and the target label:
+We computed a correlation matrix between features and the target label:
 
 - **`avg_days_between_orders`** is strongly *negatively* correlated with `label_within_7days`: users who order more frequently are much more likely to place another order within 7 days.
 - **`total_orders`** and **`unique_departments`** show positive correlation with the label: heavy, loyal users with richer category coverage are more likely to reorder soon.
