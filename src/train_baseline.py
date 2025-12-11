@@ -41,9 +41,6 @@ def main():
 
     plt.close()  # close figure to avoid memory warnings
     print("Correlation matrix saved to: ../figures/feature_corr.png")
-    # Compute correlations
-    corr = corr_df.corr()
-
 
     # 4. Simple split train/test
     # random partitioning
@@ -72,6 +69,18 @@ def main():
     # Save into a text file
     with open(output_dir / "classification_report_logistic.txt", "w") as f:
         f.write(report_text)
+
+    # predicted results
+    df_test = df_model.loc[X_test.index].copy()  # include user_id, order_id, feature, label_within7days
+
+    df_test["y_true"] = y_test
+    df_test["y_pred"] = y_pred
+    df_test["y_prob"] = y_prob
+
+    out_dir = Path("../data")
+    out_dir.mkdir(exist_ok=True)
+    df_test.to_csv(out_dir / "predictions_logreg_lr.csv", index=False)
+
 
 if __name__ == "__main__":
     main()
