@@ -27,7 +27,7 @@ xgb:
 	cd src && $(PYTHON) train_xgb.py
 
 test:
-	cd src && $(PYTHON) test_sanity.py
+	cd tests && $(PYTHON) test.py
 
 all: baseline rf xgb test prediction_plots
 
